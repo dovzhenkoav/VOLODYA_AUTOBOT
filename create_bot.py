@@ -1,6 +1,6 @@
 from aiogram import Bot
 from aiogram.dispatcher import Dispatcher
-from aiogram.contrib.fsm_storage.memory import MemoryStorage  # Импорт MemoryStorage нужен, чтобы хранить в ней временные пользовательские данные
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 import os
 

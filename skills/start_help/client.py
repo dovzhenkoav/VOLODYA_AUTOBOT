@@ -5,8 +5,7 @@ from create_bot import bot
 
 async def command_start(message: types.Message):
     """Greetings handler. Just to say hi and inform about /help."""
-    await bot.send_message(message.chat.id, 'Привет!')
-    await bot.send_message(message.chat.id, 'Если понадобится помощь: /help')
+    await bot.send_message(message.chat.id, 'Привет!\nЕсли понадобится помощь: /help')
     await message.delete()
 
 
@@ -16,8 +15,9 @@ async def command_help(message: types.Message):
     await message.answer('Бот имеет систему скиллов.\n'
                          'Для каждого скилла написана отдельная помощь.\n\n'
                          'Помощь по отдельным скиллам:\n'
-                         '/help_anek - система анекдотов;\n'
-                         '/help_queue - система менеджмента очереди в групповом чате;\n')
+                         '- /help_anek - система анекдотов;\n'
+                         '- /help_queue - система менеджмента очереди в групповом чате;\n')
+    await message.delete()
 
 
 def register_handlers_client(dp: Dispatcher):
