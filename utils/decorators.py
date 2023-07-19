@@ -1,4 +1,8 @@
-from aiogram import types, Dispatcher
+"""
+Common verifications for commands and callbacks.
+"""
+
+from aiogram import types
 
 from create_bot import bot
 from settings import BOT_ID
@@ -8,7 +12,7 @@ def only_group_chat_command(command):
     """Only for group chat command decorator."""
     async def wrapped(message: types.Message):
         if message.from_user.id == message.chat.id:
-            await message.answer('Команда предназначена для использования только в групповом чате')
+            await message.answer('Команда предназначена для использования ТОЛЬКО в групповом чате')
         else:
             bot_member = await bot.get_chat_member(message.chat.id, BOT_ID)
             if bot_member.is_chat_admin():
@@ -34,7 +38,7 @@ def only_admin_callback(command):
     async def wrapped(callback: types.CallbackQuery):
         member = await bot.get_chat_member(callback.message.chat.id, callback.from_user.id)
         if not member.is_chat_admin():
-            await callback.answer('Только админ может жмякать эту кнопку')
+            await callback.answer('Только админ может нажать эту кнопку')
         else:
             await command(callback)
     return wrapped

@@ -9,6 +9,7 @@ async def command_help_anek(message: types.Message):
     await message.answer("Скилл анекдотов нужен в развлекательных целях.\n"
                          "По команде /anek бот постит в чат рандомный анекдот с сайта baneks.ru\n"
                          "Команда работает в групповом и личном чате с ботом.")
+    await message.delete()
 
 
 async def command_get_anek(message: types.Message):

@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 
 
 async def get_anek():
-    """Make async http request to get anek."""
+    """Makes async http request to get anek."""
     async with aiohttp.ClientSession() as session:
         url = 'https://baneks.ru/random'
         async with session.get(url) as result:

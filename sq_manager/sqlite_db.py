@@ -114,16 +114,6 @@ async def get_all_chat_members(message: types.Message):
 
 async def get_all_chat_members_in_queue_without_numbers(message: types.Message):
     async with aiosqlite.connect(DB_NAME) as db:
-        # cursor = await db.execute("""
-        # SELECT chat_members.chat_id, members.member_name, members.id
-        # FROM chat_members
-        # JOIN members ON members.id = chat_members.member_id
-        # LEFT JOIN queue ON queue.member_id = chat_members.member_id
-        # WHERE chat_members.chat_id = ?
-        # AND place_in_queue IS NULL
-        # """, (message.chat.id,))
-
-
         cursor = await db.execute("""
         SELECT chat_id, member_name, member_id FROM
         (SELECT *
@@ -143,16 +133,6 @@ async def get_all_chat_members_in_queue_without_numbers(message: types.Message):
 async def get_all_members_in_queue_with_number(message: types.Message):
     async with aiosqlite.connect(DB_NAME) as db:
 
-        # cursor = await db.execute("""
-        # SELECT chat_members.chat_id, members.member_name, members.id
-        # FROM chat_members
-        # JOIN members ON members.id = chat_members.member_id
-        # LEFT JOIN queue ON queue.member_id = chat_members.member_id
-        # WHERE chat_members.chat_id = ?
-        # AND place_in_queue IS NOT NULL
-        # ORDER BY place_in_queue ASC
-        # """, (message.chat.id,))
-
         cursor = await db.execute("""
         SELECT chat_id, member_name, member_id FROM
         (SELECT *
@@ -165,7 +145,6 @@ async def get_all_members_in_queue_with_number(message: types.Message):
         LEFT JOIN members ON members.id = q1.member_id
         WHERE chat_id = ?
         """, (message.chat.id,))
-
 
         data = await cursor.fetchall()
         return data
@@ -271,168 +250,3 @@ async def update_members_places_in_queue(place_in_queue: int, chat_id: int, memb
         WHERE chat_id = ? AND member_id = ?
         """, (place_in_queue, chat_id, member_id))
         await db.commit()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-################################################################################################################
-
-async def create_queue(message: types.Message):
-    async with aiosqlite.connect(DB_NAME) as db:
-        await db.execute("""INSERT INTO queue(id, chat_title) VALUES(?, ?)""", (message.chat.id, message.chat.title))
-        await db.commit()
-
-
-
-
-
-
-async def add_member_in_db(callback: types.CallbackQuery):
-    async with aiosqlite.connect(DB_NAME) as db:
-        cursor = await db.execute("""
-        SELECT * FROM members WHERE id = ?
-        """, (callback.from_user.id,))
-        row = await cursor.fetchone()
-        if not row:
-            await db.execute("""
-            INSERT INTO members(id, member_name, member_tag)
-            VALUES(?, ?, ?)
-            """, (callback.from_user.id, callback.from_user.full_name, callback.from_user.username))
-            await db.commit()
-
-        cursor = await db.execute("""
-        SELECT * FROM queue_members WHERE queue_id = ? AND member_id = ? 
-        """, (callback.message.chat.id, callback.from_user.id))
-        row = await cursor.fetchone()
-        if not row:
-            await db.execute("""
-            INSERT INTO queue_members(queue_id, member_id)
-            VALUES(?, ?)
-            """, (callback.message.chat.id, callback.from_user.id))
-            await db.commit()
-
-
-
-
-# async def get_all_members_in_queue_with_number(message: types.Message):
-#     async with aiosqlite.connect(DB_NAME) as db:
-#         cursor = await db.execute("""
-#         SELECT place_in_queue
-#         FROM queue_members
-#         WHERE queue_id = ? AND place_in_queue IS NOT NULL
-#         ORDER BY place_in_queue DESC
-#         """, (message.chat.id,))
-#         data = await cursor.fetchall()
-#         return data
-
-async def get_all_members_in_queue_without_number(message: types.Message):
-    async with aiosqlite.connect(DB_NAME) as db:
-        cursor = await db.execute("""
-        SELECT queue_members.queue_id, member_name, member_id
-        FROM queue_members
-        JOIN members ON members.id = queue_members.member_id
-        WHERE queue_id = ? AND place_in_queue IS NULL
-        """, (message.chat.id,))
-        data = await cursor.fetchall()
-        return data
-
-
-async def get_max_place_in_queue(message: types.Message):
-    async with aiosqlite.connect(DB_NAME) as db:
-        cursor = await db.execute("""
-        SELECT place_in_queue
-        FROM queue_members
-        WHERE queue_id = ?
-        ORDER BY place_in_queue DESC
-        """, (message.chat.id,))
-        data = await cursor.fetchall()
-        return data
-
-
-
-
-# async def delete_queue(message: types.Message):
-#     async with aiosqlite.connect(DB_NAME) as db:
-#         await db.execute("""
-#         DELETE FROM queue WHERE id = ?
-#         """, (message.chat.id,))
-#
-#         await db.execute("""
-#         DELETE FROM queue_members WHERE queue_id = ?
-#         """, (message.chat.id,))
-#         await db.commit()
-
-
-
-
-
-
-
-
-
-
-async def set_next_man_in_queue(message: types.message, next_place):
-    async with aiosqlite.connect(DB_NAME) as db:
-        await db.execute("""
-        UPDATE queue_members
-        SET is_on_problem = 0
-        WHERE queue_id = ?
-        """, (message.chat.id,))
-
-        await db.execute("""
-        UPDATE queue_members
-        SET is_on_problem = 1
-        WHERE queue_id = ? AND place_in_queue = ?
-        """, (message.chat.id, next_place))
-        await db.commit()
-
-        cursor = await db.execute("""
-        SELECT member_tag FROM queue_members
-        JOIN members ON members.id = queue_members.member_id
-        WHERE queue_id = ? AND place_in_queue = ?
-        """, (message.chat.id, next_place))
-
-        data = await cursor.fetchone()
-        return data
-
-
-
-
-
-
