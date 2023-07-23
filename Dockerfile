@@ -17,5 +17,7 @@ RUN pip install --no-cache-dir -r ./requirements.txt
 RUN chmod -R 777 ./
 # RUN mkdir /bot/data
 
+EXPOSE 80
 
+CMD ["python3", "volodya_main.py"]
 # RUN python3 volodya_main.py
