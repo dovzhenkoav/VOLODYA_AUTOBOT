@@ -6,6 +6,6 @@ meta:
 build:
   requirementsPath: requirements.txt
 run:
-  scriptName: app.py
+  scriptName: volodya_main.py
   persistenceMount: /data
   containerPort: 80
