@@ -250,3 +250,24 @@ async def update_members_places_in_queue(place_in_queue: int, chat_id: int, memb
         WHERE chat_id = ? AND member_id = ?
         """, (place_in_queue, chat_id, member_id))
         await db.commit()
+
+
+### Anek gets user data
+
+async def anek_add_user_in_db(message: types.Message):
+    async with aiosqlite.connect(DB_NAME) as db:
+        try:
+            await db.execute("""
+            INSERT INTO members(id, member_name, member_tag)
+            VALUES(?, ?, ?)
+            """, (message.from_user.id, message.from_user.full_name, message.from_user.username))
+            await db.commit()
+        except sqlite3.IntegrityError:
+            await db.execute("""
+            UPDATE members
+            SET member_name = ?, member_tag= ?
+            WHERE id = ?
+            """, (message.from_user.full_name, message.from_user.username, message.from_user.id))
+            await db.commit()
+
+
