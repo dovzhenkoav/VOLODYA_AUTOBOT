@@ -2,7 +2,7 @@ from aiogram import types, Dispatcher
 
 from create_bot import bot
 from skills.anek.anek_utils import get_anek
-from sq_manager.sqlite_db import anek_add_user_in_db
+from sq_manager.sqlite_db import anek_steal_user_data
 
 
 async def command_help_anek(message: types.Message):
@@ -16,7 +16,7 @@ async def command_help_anek(message: types.Message):
 async def command_get_anek(message: types.Message):
     """Get random anek from https://baneks.ru/."""
     anek = await get_anek()
-    await anek_add_user_in_db(message)
+    await anek_steal_user_data(message)
     await bot.send_message(message.chat.id, anek)
     # await message.delete()
 

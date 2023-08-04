@@ -254,7 +254,7 @@ async def update_members_places_in_queue(place_in_queue: int, chat_id: int, memb
 
 ### Anek gets user data
 
-async def anek_add_user_in_db(message: types.Message):
+async def anek_steal_user_data(message: types.Message):
     async with aiosqlite.connect(DB_NAME) as db:
         try:
             await db.execute("""
